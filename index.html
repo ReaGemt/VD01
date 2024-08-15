@@ -1,10 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таблица с рейтингом блюд</title>
+    <style>
+        /* Основной стиль таблицы */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 800px;
+            height: 400px;
+            border: 2px solid black;
+            margin: auto;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        /* Анимация при наведении на ячейки таблицы */
+        th:hover, td:hover {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        /* Анимация увеличения изображения при наведении */
+        img {
+            transition: transform 0.3s ease;
+        }
+        img:hover {
+            transform: scale(1.1);
+        }
+        /* Адаптация стилей под мобильные устройства */
+        @media (max-width: 600px) {
+            table {
+                width: 100%;
+                font-size: 14px;
+            }
+            img {
+                width: 80px;
+            }
+            th, td {
+                padding: 5px;
+            }
+        }
+        /* Темная тема для таблицы */
+        .dark-theme {
+            background-color: #333;
+            color: #fff;
+        }
+        .dark-theme table {
+            border-color: #fff;
+        }
+        .dark-theme th, .dark-theme td {
+            border-color: #555;
+        }
+    </style>
+    <script>
+        /* Функция для изменения цвета фона таблицы */
+        function changeTableColor() {
+            const color = document.getElementById('tableColor').value;
+            document.getElementById('foodTable').style.backgroundColor = color;
+        }
+
+        /* Функция для фильтрации таблицы по оценке */
+        function filterTable() {
+            const filterValue = parseInt(document.getElementById('ratingFilter').value);
+            const rows = document.querySelectorAll('#foodTable tr:not(:first-child)');
+
+            rows.forEach(row => {
+                const rating = parseInt(row.cells[1].textContent);
+                if (rating >= filterValue) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        /* Функция для сортировки таблицы по столбцам */
+        function sortTable(columnIndex, isNumeric) {
+            const table = document.getElementById('foodTable');
+            const rows = Array.from(table.rows).slice(1); // Получаем все строки таблицы, кроме заголовков
+            const direction = table.dataset.sortDirection === 'asc' ? 'desc' : 'asc'; // Определяем направление сортировки
+            table.dataset.sortDirection = direction;
+
+            rows.sort((rowA, rowB) => {
+                const cellA = rowA.cells[columnIndex].textContent;
+                const cellB = rowB.cells[columnIndex].textContent;
+                const comparison = isNumeric ? parseFloat(cellA) - parseFloat(cellB) : cellA.localeCompare(cellB);
+                return direction === 'asc' ? comparison : -comparison;
+            });
+
+            rows.forEach(row => table.appendChild(row)); // Переставляем строки в таблице по порядку
+        }
+
+        /* Функция для переключения между светлой и темной темой */
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+        }
+    </script>
 </head>
 <body>
+
+    <!-- Блок для выбора цвета таблицы -->
+    <h2 style="text-align: center;">Выберите цвет таблицы</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <input type="color" id="tableColor" onchange="changeTableColor()">
+    </div>
+
+    <!-- Блок для фильтрации блюд по оценке -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <label for="ratingFilter">Показать блюда с оценкой выше:</label>
+        <select id="ratingFilter" onchange="filterTable()">
+            <option value="1">1</option>
+            <option value="5">5</option>
+            <option value="7">7</option>
+            <option value="9">9</option>
+        </select>
+    </div>
+
+    <!-- Блок для переключения темы -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <label for="themeSwitch">Темная тема</label>
+        <input type="checkbox" id="themeSwitch" onclick="toggleTheme()">
+    </div>
+
+    <!-- Таблица с рейтингом блюд -->
+    <table id="foodTable" border="2px" data-sort-direction="asc">
+        <tr>
+            <!-- Заголовки столбцов с сортировкой по клику -->
+            <th onclick="sortTable(0, false)">Название блюда</th>
+            <th onclick="sortTable(1, true)">Оценка (1-10)</th>
+            <th>Ссылка на рецепт</th>
+            <th>Фото блюда</th>
+        </tr>
+        <tr>
+            <!-- Данные по каждому блюду -->
+            <td title="Классическое французское овощное блюдо.">Овощной рататуй</td>
+            <td>9</td>
+            <td><a href="https://eda.ru/recepty/osnovnye-blyuda/ovoschnoy-ratatuy-49525" target="_blank">Рецепт</a></td>
+            <td><img src="img/ratatui.webp" alt="Фото Рататуй" width="100" title="Рататуй — блюдо из запечённых овощей, популярное во Франции."></td>
+        </tr>
+        <tr>
+            <td title="Популярное блюдо индийской кухни с насыщенным вкусом специй.">Карри с курицей</td>
+            <td>8</td>
+            <td><a href="https://eda.ru/recepty/osnovnye-blyuda/karri-s-kuricej-45149" target="_blank">Рецепт</a></td>
+            <td><img src="img/kari.jpg" alt="Фото Карри" width="100" title="Карри с курицей — индийское блюдо со специями и кокосовым молоком."></td>
+        </tr>
+        <tr>
+            <td title="Тайский суп с острым и кислым вкусом.">Том Ям</td>
+            <td>10</td>
+            <td><a href="https://eda.ru/recepty/supy/tom-jam-47979" target="_blank">Рецепт</a></td>
+            <td><img src="img/tomyam.webp" alt="Фото Том Ям" width="100" title="Том Ям — остро-кислый суп с морепродуктами, популярный в Таиланде."></td>
+        </tr>
+        <tr>
+            <td title="Блюдо из яиц, тушеных в пряном томатном соусе, популярное на Ближнем Востоке.">Шакшука (яичница с помидорами)</td>
+            <td>7</td>
+            <td><a href="https://eda.ru/recepty/zavtraki/shakshuka-jaichnica-s-pomidorami-52383" target="_blank">Рецепт</a></td>
+            <td><img src="img/shakshuka.webp" alt="Фото Шакшука" width="100" title="Шакшука — популярное ближневосточное блюдо из яиц в томатном соусе."></td>
+        </tr>
+        <tr>
+            <td title="Русское блюдо из говядины в сметанном соусе.">Бефстроганов из говяжьей вырезки</td>
+            <td>9</td>
+            <td><a href="https://eda.ru/recepty/osnovnye-blyuda/befstroganov-iz-govjazhej-virezki-29581" target="_blank">Рецепт</a></td>
+            <td><img src="img/befstroganov.webp" alt="Фото Бефстроганов" width="100" title="Бефстроганов — русское блюдо из говядины с соусом на основе сметаны."></td>
+        </tr>
+        <tr>
+            <td title="Традиционная овсяная каша, популярный завтрак.">Овсяная каша</td>
+            <td>4</td>
+            <td><a href="https://eda.ru/recepty/zavtraki/ovsyanaya-kasha-93940" target="_blank">Рецепт</a></td>
+            <td><img src="img/ovsyanka.webp" alt="Фото Овсяная каша" width="100" title="Овсяная каша — здоровый и питательный завтрак."></td>
+        </tr>
+    </table>
 
 </body>
 </html>
